@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,6 +21,8 @@ public class WeaponDischarge : MonoBehaviour
 
     public LayerMask canHit;
 
+    public float force = 1f;
+    
     public void Start()
     {
         this.movementPerTimeStep = this.transform.rotation * Vector3.up * this.speed * Time.fixedDeltaTime;
@@ -45,7 +47,16 @@ public class WeaponDischarge : MonoBehaviour
                 unit.DoDamage(this.damageAmount);
             }
 
+            Rigidbody2D rb = result.collider.GetComponent<Rigidbody2D>();
+
+            if (rb != null)
+            {
+                rb.AddForceAtPosition(this.transform.up * this.force, this.transform.position);
+            }
+
             Destroy(this.gameObject);
+
+            return;
         }
 
         if (Vector3.SqrMagnitude((Vector2)this.transform.position - this.startPos) >= sqrRange)

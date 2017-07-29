@@ -10,6 +10,8 @@ public class Player : BaseUnit
     private float _power;
 
     public GameObject laserShotPrefab;
+    public float laserCooldown = 0.15f;
+    private float laserTimeTillNextAllowed;
 
     public float Power
     {
@@ -19,7 +21,7 @@ public class Player : BaseUnit
         }
         protected set
         {
-            this._power = value;
+            this._power = Mathf.Clamp(value, 0, this.maxPower);
 
             if (this._power <= 0)
             {
@@ -35,8 +37,15 @@ public class Player : BaseUnit
             return this.Power / this.maxPower;
         }
     }
-	
-	void Update ()
+
+    protected override void Start()
+    {
+        base.Start();
+
+        this.Power = this.maxPower;
+    }
+
+    void Update ()
     {
         this.Move(new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")));
 
@@ -45,14 +54,17 @@ public class Player : BaseUnit
 
         float angle = -Vector3.SignedAngle(this.transform.up, (CameraRig.GetWorldMousePosition() - (Vector2)this.transform.position), Vector3.back);
 
-        if (Mathf.Abs(angle) > 5)
+        this.laserTimeTillNextAllowed -= Time.deltaTime;
+
+        if (Mathf.Abs(angle) > 1)
         {
             this.Rotate(Mathf.Clamp(angle, -1, 1));
         }
 
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0) && this.laserTimeTillNextAllowed <= 0)
         {
             GameObject.Instantiate(this.laserShotPrefab, this.transform.position, this.transform.rotation);
+            this.laserTimeTillNextAllowed = this.laserCooldown;
         }
 	}
 

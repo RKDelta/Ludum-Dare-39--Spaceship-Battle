@@ -37,7 +37,7 @@ GameObject:
   - component: {fileID: 4145892581049022}
   - component: {fileID: 114427690629262706}
   m_Layer: 8
-  m_Name: PlayerLaserShot
+  m_Name: EnemyLaserShot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -87,7 +87,7 @@ MonoBehaviour:
   hitEffect: {fileID: 0}
   canHit:
     serializedVersion: 2
-    m_Bits: 4294966783
+    m_Bits: 4294966271
   force: 1
 --- !u!212 &212031396386680084
 SpriteRenderer:
@@ -122,7 +122,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: f095436a1eb897a47a79e0ef1516a96b, type: 3}
-  m_Color: {r: 0, g: 0.7931037, b: 1, a: 1}
+  m_Color: {r: 1, g: 0, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
