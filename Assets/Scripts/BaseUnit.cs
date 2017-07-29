@@ -1,6 +1,50 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
+[System.Serializable]
+public struct DirectionalMovementSpeed
+{
+    public float forward;
+    public float left;
+    public float back;
+    public float right;
+
+    public float rotational;
+
+    public static readonly DirectionalMovementSpeed normal = new DirectionalMovementSpeed()
+    {
+        forward = 10,
+        left = 2,
+        back = 4,
+        right = 2,
+
+        rotational = 1.5f
+    };
+
+    public static Vector3 operator *(Vector3 movement, DirectionalMovementSpeed speed)
+    {
+        if (movement.y > 0)
+        {
+            movement.y *= speed.forward;
+        }
+        else if (movement.y < 0)
+        {
+            movement.y *= speed.back;
+        }
+
+        if (movement.x > 0)
+        {
+            movement.x *= speed.right;
+        }
+        else if (movement.x < 0)
+        {
+            movement.x *= speed.left;
+        }
+
+        return movement;
+    }
+}
 
 [RequireComponent(typeof(Collider2D))]
 [RequireComponent(typeof(Rigidbody2D))]
@@ -10,10 +54,9 @@ public abstract class BaseUnit : MonoBehaviour
 
     protected Rigidbody2D rb;
 
-    public float movementSpeed = 10;
-    public float rotationSpeed = 0.5f;
+    public DirectionalMovementSpeed movementSpeed = DirectionalMovementSpeed.normal;
 
-    public void Start()
+    protected virtual void Start()
     {
         this.rb = this.GetComponent<Rigidbody2D>();
 
@@ -25,13 +68,15 @@ public abstract class BaseUnit : MonoBehaviour
         this.rb.gravityScale = 0;
     }
 
-    public void Move(Vector2 direction)
+    protected void Move(Vector2 direction)
     {
+
+
         this.rb.AddRelativeForce(direction * movementSpeed);
     }
 
-    public void Rotate(float torque)
+    protected void Rotate(float torque)
     {
-        this.rb.AddTorque(torque * rotationSpeed);
+        this.rb.AddTorque(torque * movementSpeed.rotational);
     }
 }
