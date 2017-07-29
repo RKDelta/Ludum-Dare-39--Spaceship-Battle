@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,7 +22,7 @@ public class WeaponDischarge : MonoBehaviour
     public LayerMask canHit;
 
     public float force = 1f;
-
+    
     public void Start()
     {
         this.movementPerTimeStep = this.transform.rotation * Vector3.up * this.speed * Time.fixedDeltaTime;
