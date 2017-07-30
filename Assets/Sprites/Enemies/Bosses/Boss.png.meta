@@ -1,14 +1,13 @@
 fileFormatVersion: 2
-guid: e8a27c833ea2d924e9084a5ced47319c
-timeCreated: 1501352327
+guid: 2b62999c1b5c2e244b09313d673e0468
+timeCreated: 1501364918
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
-    21300000: PlayerModel_Glow_Move_0
-    21300002: PlayerModel_Glow_Move_1
-    21300004: PlayerModel_Glow_Move_2
-    21300006: PlayerModel_Glow_Move_3
-    21300008: PlayerModel_Glow_Idle_1
+    21300000: Boss_Base
+    21300002: Boss_Eyes_Normal
+    21300004: Boss_Eyes_Red
+    21300006: Boss_Arms
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -88,7 +87,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: PlayerModel_Glow_Move_0
+      name: Boss_Base
       rect:
         serializedVersion: 2
         x: 0
@@ -102,7 +101,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: PlayerModel_Glow_Move_1
+      name: Boss_Eyes_Normal
       rect:
         serializedVersion: 2
         x: 64
@@ -116,7 +115,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: PlayerModel_Glow_Move_2
+      name: Boss_Eyes_Red
       rect:
         serializedVersion: 2
         x: 128
@@ -130,7 +129,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: PlayerModel_Glow_Move_3
+      name: Boss_Arms
       rect:
         serializedVersion: 2
         x: 192
@@ -139,20 +138,6 @@ TextureImporter:
         height: 64
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: PlayerModel_Glow_Idle_1
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 64
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []

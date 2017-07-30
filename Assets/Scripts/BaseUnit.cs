@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -46,7 +46,6 @@ public struct DirectionalMovementSpeed
     }
 }
 
-[RequireComponent(typeof(Collider2D))]
 [RequireComponent(typeof(Rigidbody2D))]
 public abstract class BaseUnit : MonoBehaviour
 {
@@ -70,13 +69,11 @@ public abstract class BaseUnit : MonoBehaviour
 
     protected void Move(Vector2 direction)
     {
-
-
-        this.rb.AddRelativeForce(direction * movementSpeed);
+        this.rb.AddRelativeForce(direction * this.movementSpeed);
     }
 
     protected void Rotate(float torque)
     {
-        this.rb.AddTorque(torque * movementSpeed.rotational);
+        this.rb.AddTorque(torque * this.movementSpeed.rotational);
     }
 }
