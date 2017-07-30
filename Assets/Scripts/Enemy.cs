@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,6 +6,8 @@ using UnityEngine;
 public class Enemy : BaseUnit
 {
     [SerializeField] private float maxHealth;
+
+    public AudioClip[] laserSounds;
 
     public float Health { get; protected set; }
 
@@ -21,6 +23,8 @@ public class Enemy : BaseUnit
     public float laserCooldown = 0.75f;
     private float laserTimeTillNextAllowed;
 
+    public Animator animator;
+
     public BaseUnit target;
 
     public float targetDistance = 3;
@@ -31,6 +35,8 @@ public class Enemy : BaseUnit
 
     public float fireDistance = 5;
     private float sqrFireDistance;
+
+    public event Action<Enemy> OnDeath;
 
     public override void DoDamage(float damageAmount)
     {
@@ -44,6 +50,11 @@ public class Enemy : BaseUnit
 
     public void DestroyEnemy()
     {
+        if (this.OnDeath != null)
+        {
+            this.OnDeath(this);
+        }
+
         Destroy(this.gameObject);
     }
 
@@ -82,10 +93,20 @@ public class Enemy : BaseUnit
         if (sqrDistToTarget > this.targetDistance)
         {
             this.Move(Vector2.up);
+
+            if (this.animator != null)
+            {
+                this.animator.SetBool("Moving", true);
+            }
         }
         else
         {
             this.Move(Vector2.down);
+
+            if (this.animator != null)
+            {
+                this.animator.SetBool("Moving", false);
+            }
         }
 
         if ((sqrDistToTarget < this.sqrFireDistance) && (this.laserTimeTillNextAllowed <= 0))
@@ -93,6 +114,11 @@ public class Enemy : BaseUnit
             // Fire!
             GameObject.Instantiate(this.laserShotPrefab, this.transform.position, this.transform.rotation);
             this.laserTimeTillNextAllowed = this.laserCooldown;
+
+            if (this.laserSounds.Length > 0)
+            {
+                AudioManager.Play(this.laserSounds[UnityEngine.Random.Range(0, this.laserSounds.Length)]);
+            }
         }
     }
 }
