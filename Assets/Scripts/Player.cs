@@ -3,6 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum ControlMode
+{
+    MouseRotation,
+    KeyboardRotation,
+    Absolute
+}
+
 public class Player : BaseUnit
 {
     [SerializeField] private float maxPower = 1000;
@@ -25,6 +32,12 @@ public class Player : BaseUnit
     public AudioClip[] laserCantFireSounds;
 
     private bool justDamaged;
+
+    public ControlMode controlMode = ControlMode.MouseRotation;
+
+    public bool donePause = false;
+    public Vector2 savedVelocity;
+    public float savedAngularVelocity;
 
     public float Power
     {
@@ -60,65 +73,150 @@ public class Player : BaseUnit
         this.StartCoroutine(this.ShieldDamage());
     }
 
-    protected override void Update ()
+    protected override void Update()
     {
-        this.laserTimeTillNextAllowed -= Time.deltaTime;
-
-        this.MoveRelative(new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")));
-
-        if (Input.GetAxisRaw("Vertical") > 0)
+        if (GameController.Instance.isPaused)
         {
-            if (this.animator != null)
+            if (this.donePause == false)
             {
-                this.animator.SetBool("Moving", true);
+                this.savedVelocity = this.rb.velocity;
+                this.savedAngularVelocity = this.rb.angularVelocity;
+
+                this.rb.velocity = Vector3.zero;
+                this.rb.angularVelocity = 0;
+
+                this.donePause = true;
             }
         }
         else
         {
-            if (this.animator != null)
+            if (this.donePause == true)
             {
-                this.animator.SetBool("Moving", false);
+                this.rb.velocity = this.savedVelocity;
+                this.rb.angularVelocity = this.savedAngularVelocity;
+
+                this.donePause = false;
+            }
+
+            this.laserTimeTillNextAllowed -= Time.deltaTime;
+
+            if (this.controlMode == ControlMode.Absolute)
+            {
+                Vector2 movement = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+
+                this.MoveAbsolute(movement);
+
+                if (Vector3.Dot(movement, this.transform.up) > 0)
+                {
+                    if (this.animator != null)
+                    {
+                        this.animator.SetBool("Moving", true);
+                    }
+                }
+                else
+                {
+                    if (this.animator != null)
+                    {
+                        this.animator.SetBool("Moving", false);
+                    }
+                }
+            }
+            else if (this.controlMode == ControlMode.MouseRotation)
+            {
+                this.MoveRelative(new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")));
+
+                if (Input.GetAxisRaw("Vertical") > 0)
+                {
+                    if (this.animator != null)
+                    {
+                        this.animator.SetBool("Moving", true);
+                    }
+                }
+                else
+                {
+                    if (this.animator != null)
+                    {
+                        this.animator.SetBool("Moving", false);
+                    }
+                }
+            }
+            else // Keyboard Rotation
+            {
+                this.MoveRelative(new Vector2(Input.GetAxisRaw("Strafe"), Input.GetAxisRaw("Vertical")));
+
+                if (Input.GetAxisRaw("Vertical") > 0)
+                {
+                    if (this.animator != null)
+                    {
+                        this.animator.SetBool("Moving", true);
+                    }
+                }
+                else
+                {
+                    if (this.animator != null)
+                    {
+                        this.animator.SetBool("Moving", false);
+                    }
+                }
+            }
+
+
+            Debug.DrawRay(this.transform.position, this.transform.up * 100, Color.blue);
+
+            float angle;
+
+            Vector2 targetPos;
+
+            if (this.controlMode == ControlMode.MouseRotation || this.controlMode == ControlMode.Absolute)
+            {
+                Debug.DrawRay(this.transform.position, (CameraRig.GetWorldMousePosition() - (Vector2)this.transform.position), Color.red);
+
+                angle = -Vector3.SignedAngle(this.transform.up, (CameraRig.GetWorldMousePosition() - (Vector2)this.transform.position), Vector3.back);
+
+                if (Mathf.Abs(angle) > 1)
+                {
+                    this.Rotate(Mathf.Clamp(angle, -1, 1));
+                }
+
+                targetPos = CameraRig.GetWorldMousePosition();
+            }
+            else // Keyboard Rotation
+            {
+                angle = -Input.GetAxisRaw("Horizontal");
+
+                this.Rotate(angle);
+
+                targetPos = this.transform.position + this.transform.up * 8;
+            }
+
+            if ((Input.GetMouseButton(0) || Input.GetKey(KeyCode.Space)) && this.laserTimeTillNextAllowed <= 0)
+            {
+                Vector2 worldLaserSpawnPoint =
+                    this.transform.position + this.transform.rotation * this.laserSpawnPoints[this.laserSpawnIndex].Rotation * this.laserSpawnPoints[this.laserSpawnIndex].position;
+
+                Quaternion laserDirection =
+                    Quaternion.RotateTowards(
+                        this.transform.rotation,
+                        Quaternion.Euler(0, 0, -Vector3.SignedAngle(Vector3.up, (targetPos - worldLaserSpawnPoint), Vector3.back)),
+                        30.0f);
+
+                GameObject shotGO = GameObject.Instantiate(
+                    this.laserShotPrefab,
+                    worldLaserSpawnPoint,
+                    laserDirection);
+
+                WeaponDischarge discharge = shotGO.GetComponent<WeaponDischarge>();
+                discharge.parentVelocity = this.rb.velocity;
+
+                this.laserSpawnIndex++;
+                this.laserSpawnIndex %= this.laserSpawnPoints.Length;
+
+                this.laserTimeTillNextAllowed = this.laserCooldown;
+
+                AudioManager.Play(this.laserSounds[UnityEngine.Random.Range(0, this.laserSounds.Length)]);
             }
         }
-
-
-        Debug.DrawRay(this.transform.position, this.transform.up * 100, Color.blue);
-        Debug.DrawRay(this.transform.position, (CameraRig.GetWorldMousePosition() - (Vector2)this.transform.position), Color.red);
-
-        float angle = -Vector3.SignedAngle(this.transform.up, (CameraRig.GetWorldMousePosition() - (Vector2)this.transform.position), Vector3.back);
-
-        if (Mathf.Abs(angle) > 1)
-        {
-            this.Rotate(Mathf.Clamp(angle, -1, 1));
-        }
-
-        if (Input.GetMouseButton(0) && this.laserTimeTillNextAllowed <= 0)
-        {
-            Vector2 worldLaserSpawnPoint = 
-                this.transform.position + this.transform.rotation * this.laserSpawnPoints[this.laserSpawnIndex].Rotation * this.laserSpawnPoints[this.laserSpawnIndex].position;
-
-            Quaternion laserDirection = 
-                Quaternion.RotateTowards(
-                    this.transform.rotation,
-                    Quaternion.Euler(0, 0, -Vector3.SignedAngle(Vector3.up, (CameraRig.GetWorldMousePosition() - worldLaserSpawnPoint), Vector3.back)),
-                    30.0f);
-
-            GameObject shotGO = GameObject.Instantiate(
-                this.laserShotPrefab, 
-                worldLaserSpawnPoint,
-                laserDirection);
-
-            WeaponDischarge discharge = shotGO.GetComponent<WeaponDischarge>();
-            discharge.parentVelocity = this.rb.velocity;
-
-            this.laserSpawnIndex++;
-            this.laserSpawnIndex %= this.laserSpawnPoints.Length;
-
-            this.laserTimeTillNextAllowed = this.laserCooldown;
-
-            AudioManager.Play(this.laserSounds[UnityEngine.Random.Range(0, this.laserSounds.Length)]);
-        }
-	}
+    }
 
     public override void DoDamage(float damageAmount)
     {

@@ -24,7 +24,7 @@ public class WeaponDischarge : MonoBehaviour
     public float force = 1f;
 
     [HideInInspector] public Vector3 parentVelocity;
-    
+
     public void Start()
     {
         this.startPos = this.transform.position;
@@ -40,34 +40,37 @@ public class WeaponDischarge : MonoBehaviour
 
     public void FixedUpdate()
     {
-        this.transform.Translate(this.movementPerTimeStep, Space.World);
-
-        RaycastHit2D result = Physics2D.Raycast(this.transform.position, this.transform.up, this.activationDistance, this.canHit);
-
-        if (result.collider != null)
+        if (GameController.Instance.isPaused == false)
         {
-            BaseUnit unit = result.collider.GetComponent<BaseUnit>();
+            this.transform.Translate(this.movementPerTimeStep, Space.World);
 
-            if (unit != null)
+            RaycastHit2D result = Physics2D.Raycast(this.transform.position, this.transform.up, this.activationDistance, this.canHit);
+
+            if (result.collider != null)
             {
-                unit.DoDamage(this.damageAmount);
+                BaseUnit unit = result.collider.GetComponent<BaseUnit>();
+
+                if (unit != null)
+                {
+                    unit.DoDamage(this.damageAmount);
+                }
+
+                Rigidbody2D rb = result.collider.GetComponent<Rigidbody2D>();
+
+                if (rb != null)
+                {
+                    rb.AddForceAtPosition(this.transform.up * this.force * Time.deltaTime, this.transform.position);
+                }
+
+                Destroy(this.gameObject);
+
+                return;
             }
 
-            Rigidbody2D rb = result.collider.GetComponent<Rigidbody2D>();
-
-            if (rb != null)
+            if (Vector3.SqrMagnitude((Vector2)this.transform.position - this.startPos) >= this.sqrRange)
             {
-                rb.AddForceAtPosition(this.transform.up * this.force * Time.deltaTime, this.transform.position);
+                Destroy(this.gameObject);
             }
-
-            Destroy(this.gameObject);
-
-            return;
-        }
-
-        if (Vector3.SqrMagnitude((Vector2)this.transform.position - this.startPos) >= this.sqrRange)
-        {
-            Destroy(this.gameObject);
         }
     }
 }

@@ -10,6 +10,8 @@ public class PowerBarController : MonoBehaviour
 
     public Image powerBarCrack;
 
+    public Text powerPercent;
+
     private void Start()
     {
         this.powerBarCrack.gameObject.SetActive(false);
@@ -25,5 +27,7 @@ public class PowerBarController : MonoBehaviour
         {
             this.powerBarCrack.gameObject.SetActive(true);
         }
+
+        this.powerPercent.text = string.Format("{0}%", Mathf.RoundToInt(this.player.PowerProportional * 100));
     }
 }

@@ -10,6 +10,8 @@ public struct DirectionalMovementSpeed
     public float back;
     public float right;
 
+    public float absolute;
+
     public float rotational;
 
     public static readonly DirectionalMovementSpeed normal = new DirectionalMovementSpeed()
@@ -18,6 +20,8 @@ public struct DirectionalMovementSpeed
         left = 2,
         back = 4,
         right = 2,
+
+        absolute = 10,
 
         rotational = 1.5f
     };
@@ -75,6 +79,11 @@ public abstract class BaseUnit : MonoBehaviour
     protected void MoveRelative(Vector2 direction)
     {
         this.rb.AddRelativeForce(direction * this.movementSpeed);
+    }
+
+    protected void MoveAbsolute(Vector2 direction)
+    {
+        this.rb.AddForce(direction * this.movementSpeed.absolute);
     }
 
     protected void Rotate(float torque)

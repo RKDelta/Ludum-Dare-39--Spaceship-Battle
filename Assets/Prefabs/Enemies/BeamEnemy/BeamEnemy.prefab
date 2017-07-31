@@ -184,8 +184,14 @@ MonoBehaviour:
     left: 2
     back: 6
     right: 2
+    absolute: 10
     rotational: 800
   maxHealth: 80
+  deathPrefabs:
+  - {fileID: 1542568440961304, guid: f79c5f0dd63f0514a84c83cc0a77ba31, type: 2}
+  - {fileID: 1829882346488938, guid: 3484e3c3104aa234d9c6b479e6b6ba7b, type: 2}
+  - {fileID: 1704742678272904, guid: b86665dc5cd93c44191fb9c0da6edce3, type: 2}
+  - {fileID: 1418874511444136, guid: 1c34b041aee7726439b0a128de1e065c, type: 2}
   weaponFireSounds:
   - {fileID: 8300000, guid: 1e443e5a195cbb144a2effdbcf9510f3, type: 3}
   uraniumPrefabs:
@@ -204,6 +210,9 @@ MonoBehaviour:
   environmentLayer:
     serializedVersion: 2
     m_Bits: 2048
+  donePause: 0
+  savedVelocity: {x: 0, y: 0}
+  savedAngularVelocity: 0
   chargeTime: 0.2834
   chargingSounds: []
 --- !u!212 &212242784932973578

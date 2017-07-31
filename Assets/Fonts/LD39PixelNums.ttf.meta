@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 368d890292a043d4dbfc9542c295b9fb
+timeCreated: 1501541898
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: LD39Pixel
+  fontNames:
+  - LD39Pixel
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

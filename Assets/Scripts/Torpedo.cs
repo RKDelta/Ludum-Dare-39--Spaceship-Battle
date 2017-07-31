@@ -23,6 +23,12 @@ public class Torpedo : BaseUnit
 
     public float maxTime;
 
+    public bool donePause = false;
+    public Vector2 savedVelocity;
+    public float savedAngularVelocity;
+
+    public GameObject explosionPrefab;
+
     protected override void Start()
     {
         base.Start();
@@ -34,37 +40,63 @@ public class Torpedo : BaseUnit
 
     protected override void Update()
     {
-        base.Update();
-
-        this.timeSinceCreation += Time.deltaTime;
-
-        if (this.timeSinceCreation > this.thrusterActivationTime)
+        if (GameController.Instance.isPaused)
         {
-            this.thrustersActive = true;
-
-            if (Physics2D.Raycast(this.transform.position, this.transform.up, this.activationDistance, this.canHit).collider != null)
+            if (this.donePause == false)
             {
-                this.Explode();
+                this.savedVelocity = this.rb.velocity;
+                this.savedAngularVelocity = this.rb.angularVelocity;
+
+                this.rb.velocity = Vector3.zero;
+                this.rb.angularVelocity = 0;
+
+                this.donePause = true;
             }
-
-            if (this.timeSinceCreation > this.maxTime)
+        }
+        else
+        {
+            if (this.donePause == true)
             {
-                this.Explode();
+                this.rb.velocity = this.savedVelocity;
+                this.rb.angularVelocity = this.savedAngularVelocity;
+
+                this.donePause = false;
+            }
+            base.Update();
+
+            this.timeSinceCreation += Time.deltaTime;
+
+            if (this.timeSinceCreation > this.thrusterActivationTime)
+            {
+                this.thrustersActive = true;
+
+                if (Physics2D.Raycast(this.transform.position, this.transform.up, this.activationDistance, this.canHit).collider != null)
+                {
+                    this.Explode();
+                }
+
+                if (this.timeSinceCreation > this.maxTime)
+                {
+                    this.Explode();
+                }
             }
         }
     }
 
     public void FixedUpdate()
     {
-        if (this.thrustersActive)
+        if (GameController.Instance.isPaused == false)
         {
-            this.animator.SetBool("Moving", true);
+            if (this.thrustersActive)
+            {
+                this.animator.SetBool("Moving", true);
 
-            this.MoveRelative(Vector3.up);
+                this.MoveRelative(Vector3.up);
 
-            float angle = -Vector3.SignedAngle(this.transform.up, ((Vector2)this.target.position - (Vector2)this.transform.position), Vector3.back);
-            
-            this.Rotate(Mathf.Clamp(angle, -1, 1));
+                float angle = -Vector3.SignedAngle(this.transform.up, ((Vector2)this.target.position - (Vector2)this.transform.position), Vector3.back);
+
+                this.Rotate(Mathf.Clamp(angle, -1, 1));
+            }
         }
     }
 
@@ -93,6 +125,11 @@ public class Torpedo : BaseUnit
                 rb.AddForceAtPosition(this.transform.up * this.force, this.transform.position, ForceMode2D.Impulse);
             }
         }
+
+        GameObject.Instantiate(
+            this.explosionPrefab,
+            this.transform.position,
+            Quaternion.Euler(0, 0, UnityEngine.Random.Range(0, 360)));
 
         Destroy(this.gameObject);
         return;

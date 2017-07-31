@@ -24,6 +24,16 @@ public class GameController : MonoBehaviour
     public GameObject[] asteroidPrefabs;
     public int numAsteroids = 50;
 
+    public BossHealthBarController bossBar;
+
+    public HideUI enemyIndicator;
+
+    public DeathScreen deathScreen;
+    public PauseScreen pauseScreen;
+
+    public float minEnemyIndicatorRange = 15;
+    private float minEnemyIndicatorSqrRange;
+
     private void Awake()
     {
         this.enemies = new List<Enemy>();
@@ -36,9 +46,14 @@ public class GameController : MonoBehaviour
         }
 
         Instance = this;
+
+        this.minEnemyIndicatorSqrRange = this.minEnemyIndicatorRange * this.minEnemyIndicatorRange;
+
+        this.deathScreen.DeactivateDeathScreen();
+        this.pauseScreen.DeactivatePauseScreen();
     }
 
-    void Start ()
+    void Start()
     {
         for (int i = 0; i < this.numAsteroids; i++)
         {
@@ -51,95 +66,164 @@ public class GameController : MonoBehaviour
                 pos,
                 Quaternion.Euler(0, 0, UnityEngine.Random.Range(0, 360)));
         }
-	}
-	
-	void FixedUpdate ()
+
+        this.bossBar.gameObject.SetActive(false);
+    }
+
+    void Update()
     {
-        if (this.enemies.Count == 0)
+        if (this.player.Power <= 0)
         {
-            foreach (EnemySpawnData data in this.waves[this.waveIndex].enemies)
+            this.isPaused = true;
+            this.deathScreen.ActivateDeathScreen(this.waveIndex - 1);
+        }
+
+        if (Input.GetKeyUp(KeyCode.Escape))
+        {
+            this.isPaused = this.isPaused == false;
+
+            if (this.isPaused)
             {
-                for (int i = 0; i < data.count; i++)
+                this.pauseScreen.ActivatePauseScreen();
+            }
+            else
+            {
+                this.pauseScreen.DeactivatePauseScreen();
+            }
+        }
+
+        if (this.isPaused == false)
+        {
+            if (this.enemies.Count == 0 && this.waveIndex < this.waves.Length)
+            {
+                foreach (EnemySpawnData data in this.waves[this.waveIndex].enemies)
                 {
-                    GameObject enemyGO;
-
-                    if (data.randomizePosition)
+                    for (int i = 0; i < data.count; i++)
                     {
-                        Vector2 pos = new Vector3(UnityEngine.Random.Range(10, this.maxXDist), UnityEngine.Random.Range(10, this.maxYDist), 0);
-                        pos.x *= UnityEngine.Random.Range(0, 2) == 0 ? 1 : -1;
-                        pos.y *= UnityEngine.Random.Range(0, 2) == 0 ? 1 : -1;
+                        GameObject enemyGO;
 
-                        pos += (Vector2)this.player.transform.position;
+                        if (data.randomizePosition)
+                        {
+                            Vector2 pos = new Vector3(UnityEngine.Random.Range(10, this.maxXDist), UnityEngine.Random.Range(10, this.maxYDist), 0);
+                            pos.x *= UnityEngine.Random.Range(0, 2) == 0 ? 1 : -1;
+                            pos.y *= UnityEngine.Random.Range(0, 2) == 0 ? 1 : -1;
 
-                        enemyGO = GameObject.Instantiate(
-                            data.enemyPrefab,
-                            pos,
-                            Quaternion.Euler(0, 0, UnityEngine.Random.Range(0, 360)));
+                            pos += (Vector2)this.player.transform.position;
+
+                            enemyGO = GameObject.Instantiate(
+                                data.enemyPrefab,
+                                pos,
+                                Quaternion.Euler(0, 0, UnityEngine.Random.Range(0, 360)));
+                        }
+                        else
+                        {
+                            enemyGO = GameObject.Instantiate(
+                                data.enemyPrefab);
+                        }
+
+                        Enemy enemy = enemyGO.GetComponent<Enemy>();
+
+                        if (enemy != null)
+                        {
+                            enemy.target = this.player;
+                            enemy.OnDeath += this.OnEnemyDeath;
+
+                            this.enemies.Add(enemy);
+                        }
+                        else
+                        {
+                            BossWallController wall = enemyGO.GetComponent<BossWallController>();
+
+                            Vector2 pos = new Vector2(this.player.transform.position.x, player.transform.position.y + (wall.height / 2) - 6);
+
+                            enemyGO.transform.position = pos;
+
+                            // ITS A BOSS!
+
+                            this.bossBar.boss = enemyGO.GetComponentInChildren<Boss>();
+                            this.bossBar.gameObject.SetActive(true);
+                        }
                     }
-                    else
+                }
+
+                this.waveIndex++;
+            }
+
+            foreach (GameObject go in this.moveRelativeToPlayer)
+            {
+                Vector3 pos = go.transform.position;
+                Vector3 relPos = pos - this.player.transform.position;
+
+                if (relPos.x > this.maxXDist)
+                {
+                    pos.x -= this.maxXDist * 2;
+                }
+                else if (relPos.x < -this.maxXDist)
+                {
+                    pos.x += this.maxXDist * 2;
+                }
+
+                if (relPos.y > this.maxXDist)
+                {
+                    pos.y -= this.maxXDist * 2;
+                }
+                else if (relPos.y < -this.maxYDist)
+                {
+                    pos.y += this.maxXDist * 2;
+                }
+
+                go.transform.position = pos;
+            }
+
+            if (this.enemies.Count > 0)
+            {
+                Enemy closestEnemy = null;
+                float closestSqrDist = Mathf.Infinity;
+
+                foreach (Enemy enemy in this.enemies)
+                {
+                    float sqrDist = Vector3.SqrMagnitude(this.player.transform.position - enemy.transform.position);
+
+                    if (closestEnemy == null || sqrDist < closestSqrDist)
                     {
-                        enemyGO = GameObject.Instantiate(
-                            data.enemyPrefab);
+                        closestEnemy = enemy;
+                        closestSqrDist = sqrDist;
                     }
+                }
 
-                    Enemy enemy = enemyGO.GetComponent<Enemy>();
+                this.enemyIndicator.transform.rotation =
+                    Quaternion.Euler(0, 0, -Vector3.SignedAngle(Vector3.up, (closestEnemy.transform.position - player.transform.position), Vector3.back));
 
-                    if (enemy != null)
-                    {
-                        enemy.target = this.player;
-                        enemy.OnDeath += this.OnEnemyDeath;
-                    }
-                    else
-                    {
-                        // ITS A BOSS!
-                    }
-
-                    this.enemies.Add(enemy);
+                if (closestSqrDist > this.minEnemyIndicatorSqrRange)
+                {
+                    this.enemyIndicator.baseAlpha = Mathf.Clamp01(this.enemyIndicator.baseAlpha + Time.deltaTime / 2);
+                }
+                else
+                {
+                    this.enemyIndicator.baseAlpha = Mathf.Clamp01(this.enemyIndicator.baseAlpha - Time.deltaTime / 2);
                 }
             }
-
-            this.waveIndex++;
+            else
+            {
+                this.enemyIndicator.baseAlpha = Mathf.Clamp01(this.enemyIndicator.baseAlpha - Time.deltaTime / 2);
+            }
         }
-
-        foreach (GameObject go in this.moveRelativeToPlayer)
-        {
-            Vector3 pos = go.transform.position;
-            Vector3 relPos = pos - this.player.transform.position;
-
-            if (relPos.x > this.maxXDist)
-            {
-                pos.x -= this.maxXDist * 2;
-            }
-            else if (relPos.x < -this.maxXDist)
-            {
-                pos.x += this.maxXDist * 2;
-            }
-
-            if (relPos.y > this.maxXDist)
-            {
-                pos.y -= this.maxXDist * 2;
-            }
-            else if (relPos.y < -this.maxYDist)
-            {
-                pos.y += this.maxXDist * 2;
-            }
-
-            go.transform.position = pos;
-        }
-	}
+    }
 
     void OnEnemyDeath(GameObject enemy)
     {
         this.enemies.Remove(enemy.GetComponent<Enemy>());
     }
 
+    public void RemoveObjectFromRelativeMovement(GameObject gameObject)
+    {
+        this.moveRelativeToPlayer.Remove(gameObject);
+    }
+
     public void ObjectMoveRelativeToPlayer(GameObject gameObject, ref Action<GameObject> OnDeath)
     {
         this.moveRelativeToPlayer.Add(gameObject);
 
-        OnDeath += (GameObject go) =>
-        {
-            this.moveRelativeToPlayer.Remove(go);
-        };
+        OnDeath += this.RemoveObjectFromRelativeMovement;
     }
 }

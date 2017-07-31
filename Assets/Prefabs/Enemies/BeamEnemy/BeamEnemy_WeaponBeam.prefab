@@ -119,7 +119,7 @@ MonoBehaviour:
   damagesPS: 50
   canHit:
     serializedVersion: 2
-    m_Bits: 2560
+    m_Bits: 6656
   force: 75
 --- !u!212 &212531418544227340
 SpriteRenderer:

@@ -35,7 +35,6 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4254153667927544}
-  - component: {fileID: 114462535154188376}
   - component: {fileID: 114186149597484536}
   m_Layer: 0
   m_Name: BossBeam
@@ -120,24 +119,8 @@ MonoBehaviour:
   damagesPS: 500
   canHit:
     serializedVersion: 2
-    m_Bits: 512
+    m_Bits: 2560
   force: 80
---- !u!114 &114462535154188376
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1433677825593652}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e1e4f90168373054ea3bd3e033c0caee, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  damage: 500
-  can_hit:
-    serializedVersion: 2
-    m_Bits: 512
-  player: {fileID: 0}
 --- !u!212 &212569048698431056
 SpriteRenderer:
   m_ObjectHideFlags: 1

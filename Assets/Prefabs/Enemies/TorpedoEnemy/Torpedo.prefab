@@ -177,11 +177,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   movementSpeed:
-    forward: 25
+    forward: 15
     left: 0
     back: 0
     right: 0
-    rotational: 3
+    absolute: 10
+    rotational: 1.2
   target: {fileID: 0}
   activationDistance: 0.75
   explosionRadius: 2
@@ -192,6 +193,11 @@ MonoBehaviour:
   thrusterActivationTime: 1
   animator: {fileID: 95036421798558598}
   maxTime: 10
+  donePause: 0
+  savedVelocity: {x: 0, y: 0}
+  savedAngularVelocity: 0
+  explosionPrefab: {fileID: 1542568440961304, guid: f79c5f0dd63f0514a84c83cc0a77ba31,
+    type: 2}
 --- !u!212 &212321309808522930
 SpriteRenderer:
   m_ObjectHideFlags: 1

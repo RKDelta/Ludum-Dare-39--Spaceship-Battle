@@ -114,7 +114,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 1
-  m_Mass: 1.0990202
+  m_Mass: 20
   m_LinearDrag: 1
   m_AngularDrag: 400
   m_GravityScale: 1
@@ -188,8 +188,14 @@ MonoBehaviour:
     left: 4
     back: 6
     right: 4
+    absolute: 10
     rotational: 100
   maxHealth: 200
+  deathPrefabs:
+  - {fileID: 1542568440961304, guid: f79c5f0dd63f0514a84c83cc0a77ba31, type: 2}
+  - {fileID: 1672228276106294, guid: 9629d08ed808bfe479e93356d74ab36f, type: 2}
+  - {fileID: 1647281268118798, guid: 3cb0506c4c6fa9145977652a51389811, type: 2}
+  - {fileID: 1119146587206054, guid: c4cb626fdbb226d4aa5da49cea561161, type: 2}
   weaponFireSounds: []
   uraniumPrefabs:
   - {fileID: 1544758040426124, guid: 692e78b05ef43bd4e8aa5be7c4189f88, type: 2}
@@ -207,6 +213,9 @@ MonoBehaviour:
   environmentLayer:
     serializedVersion: 2
     m_Bits: 2048
+  donePause: 0
+  savedVelocity: {x: 0, y: 0}
+  savedAngularVelocity: 0
 --- !u!212 &212228265151729072
 SpriteRenderer:
   m_ObjectHideFlags: 1
