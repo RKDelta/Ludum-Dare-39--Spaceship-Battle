@@ -13,11 +13,13 @@ public class Player : BaseUnit
     public float laserCooldown = 0.15f;
     private float laserTimeTillNextAllowed;
 
+    public GameObject shields;
+
     public Animator animator;
     public Animator shieldAnimator;
 
-    public Vector2[] laserSpawnPoints;
-    private int laserSpawnIndex;
+    public SpawnPoint[] laserSpawnPoints;
+    private int laserSpawnIndex = 0;
 
     public AudioClip[] laserSounds;
     public AudioClip[] laserCantFireSounds;
@@ -41,7 +43,7 @@ public class Player : BaseUnit
         }
     }
 
-    public float PowerProprtional
+    public float PowerProportional
     {
         get
         {
@@ -58,9 +60,11 @@ public class Player : BaseUnit
         this.StartCoroutine(this.ShieldDamage());
     }
 
-    void Update ()
+    protected override void Update ()
     {
-        this.Move(new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")));
+        this.laserTimeTillNextAllowed -= Time.deltaTime;
+
+        this.MoveRelative(new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")));
 
         if (Input.GetAxisRaw("Vertical") > 0)
         {
@@ -83,8 +87,6 @@ public class Player : BaseUnit
 
         float angle = -Vector3.SignedAngle(this.transform.up, (CameraRig.GetWorldMousePosition() - (Vector2)this.transform.position), Vector3.back);
 
-        this.laserTimeTillNextAllowed -= Time.deltaTime;
-
         if (Mathf.Abs(angle) > 1)
         {
             this.Rotate(Mathf.Clamp(angle, -1, 1));
@@ -92,7 +94,8 @@ public class Player : BaseUnit
 
         if (Input.GetMouseButton(0) && this.laserTimeTillNextAllowed <= 0)
         {
-            Vector2 worldLaserSpawnPoint = this.transform.position + this.transform.rotation * this.laserSpawnPoints[this.laserSpawnIndex];
+            Vector2 worldLaserSpawnPoint = 
+                this.transform.position + this.transform.rotation * this.laserSpawnPoints[this.laserSpawnIndex].Rotation * this.laserSpawnPoints[this.laserSpawnIndex].position;
 
             Quaternion laserDirection = 
                 Quaternion.RotateTowards(
@@ -100,10 +103,13 @@ public class Player : BaseUnit
                     Quaternion.Euler(0, 0, -Vector3.SignedAngle(Vector3.up, (CameraRig.GetWorldMousePosition() - worldLaserSpawnPoint), Vector3.back)),
                     30.0f);
 
-            GameObject.Instantiate(
+            GameObject shotGO = GameObject.Instantiate(
                 this.laserShotPrefab, 
                 worldLaserSpawnPoint,
                 laserDirection);
+
+            WeaponDischarge discharge = shotGO.GetComponent<WeaponDischarge>();
+            discharge.parentVelocity = this.rb.velocity;
 
             this.laserSpawnIndex++;
             this.laserSpawnIndex %= this.laserSpawnPoints.Length;
@@ -142,21 +148,33 @@ public class Player : BaseUnit
         }
     }
 
+    public void OnTriggerEnter2D(Collider2D collider)
+    {
+        UraniumData uranium = collider.GetComponent<UraniumData>();
+
+        if (uranium != null)
+        {
+            this.Power += uranium.powerAmount;
+
+            Destroy(collider.gameObject);
+        }
+    }
+
     public void PlayerDeath()
     {
         Debug.Log("The player died.");
 
-        Destroy(this.gameObject);
+        this.shields.SetActive(false);
     }
 
     public void OnDrawGizmosSelected()
     {
-        Vector2[] points = this.laserSpawnPoints;
-
-        for (int i = 0; i < points.Length; i++)
+        for (int i = 0; i < this.laserSpawnPoints.Length; i++)
         {
-            Gizmos.color = Color.red;
-            Gizmos.DrawRay((Vector2)this.transform.position + this.laserSpawnPoints[i], Vector2.up * 0.25f);
+            //Gizmos.color = Color.red;
+            //Gizmos.DrawRay((Vector2)this.transform.position + this.laserSpawnPoints[i], Vector2.up * 0.25f);
+
+            this.laserSpawnPoints[i].DrawGizmo(this.transform);
         }
     }
 }

@@ -137,14 +137,17 @@ MonoBehaviour:
     right: 2
     rotational: 1.5
   maxHealth: 100
-  laserShotPrefab: {fileID: 1464496796956260, guid: 90185904d1487df438757d314a185ca2,
+  weaponFireSounds: []
+  weaponDischargePrefab: {fileID: 1464496796956260, guid: 90185904d1487df438757d314a185ca2,
     type: 2}
-  laserCooldown: 0.35
+  weaponCooldown: 0.75
   animator: {fileID: 0}
   target: {fileID: 0}
   targetDistance: 12
   targetDistanceRange: 0.75
   fireDistance: 12
+  dischargeSpawnPoints:
+  - {x: 0, y: 0}
 --- !u!212 &212015119723616640
 SpriteRenderer:
   m_ObjectHideFlags: 1

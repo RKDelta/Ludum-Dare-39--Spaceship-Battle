@@ -22,12 +22,18 @@ public class WeaponDischarge : MonoBehaviour
     public LayerMask canHit;
 
     public float force = 1f;
+
+    [HideInInspector] public Vector3 parentVelocity;
     
     public void Start()
     {
-        this.movementPerTimeStep = this.transform.rotation * Vector3.up * this.speed * Time.fixedDeltaTime;
+        this.startPos = this.transform.position;
 
-        this.activationDistance = this.movementPerTimeStep.magnitude * 2f;
+        float initialSpeed = Vector3.Dot(this.parentVelocity, this.transform.up);
+
+        this.movementPerTimeStep = this.transform.rotation * Vector3.up * (this.speed + initialSpeed) * Time.fixedDeltaTime;
+
+        this.activationDistance = this.movementPerTimeStep.magnitude * 1.1f;
 
         this.sqrRange = this.range * this.range;
     }
@@ -36,7 +42,7 @@ public class WeaponDischarge : MonoBehaviour
     {
         this.transform.Translate(this.movementPerTimeStep, Space.World);
 
-        RaycastHit2D result = Physics2D.Raycast(this.transform.position, this.transform.forward, this.activationDistance, this.canHit);
+        RaycastHit2D result = Physics2D.Raycast(this.transform.position, this.transform.up, this.activationDistance, this.canHit);
 
         if (result.collider != null)
         {
@@ -51,7 +57,7 @@ public class WeaponDischarge : MonoBehaviour
 
             if (rb != null)
             {
-                rb.AddForceAtPosition(this.transform.up * this.force, this.transform.position);
+                rb.AddForceAtPosition(this.transform.up * this.force * Time.deltaTime, this.transform.position);
             }
 
             Destroy(this.gameObject);
@@ -59,7 +65,7 @@ public class WeaponDischarge : MonoBehaviour
             return;
         }
 
-        if (Vector3.SqrMagnitude((Vector2)this.transform.position - this.startPos) >= sqrRange)
+        if (Vector3.SqrMagnitude((Vector2)this.transform.position - this.startPos) >= this.sqrRange)
         {
             Destroy(this.gameObject);
         }

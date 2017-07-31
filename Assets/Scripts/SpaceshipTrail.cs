@@ -32,7 +32,7 @@ public class SpaceshipTrail : MonoBehaviour
 
         for (int i = 0; i < this.bufferSize; i++)
         {
-            GameObject go = GameObject.Instantiate(trailParticlePrefab, this.transform);
+            GameObject go = GameObject.Instantiate(this.trailParticlePrefab, this.transform);
 
             go.SetActive(false);
 
@@ -60,7 +60,7 @@ public class SpaceshipTrail : MonoBehaviour
             dist -= this.minDist;
         }
         
-        while (this.activeParticles.Count > 0 && (Time.time - this.activeParticles.Peek().timeStart) >= maxTime)
+        while (this.activeParticles.Count > 0 && (Time.time - this.activeParticles.Peek().timeStart) >= this.maxTime)
         {
             ParticleTime activeParticle = this.activeParticles.Dequeue();
 

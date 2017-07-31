@@ -67,7 +67,12 @@ public abstract class BaseUnit : MonoBehaviour
         this.rb.gravityScale = 0;
     }
 
-    protected void Move(Vector2 direction)
+    protected virtual void Update()
+    {
+
+    }
+
+    protected void MoveRelative(Vector2 direction)
     {
         this.rb.AddRelativeForce(direction * this.movementSpeed);
     }

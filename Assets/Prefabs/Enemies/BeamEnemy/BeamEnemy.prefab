@@ -21,7 +21,7 @@ GameObject:
   - component: {fileID: 4928554965886692}
   - component: {fileID: 60749818746894906}
   - component: {fileID: 50425897343746406}
-  - component: {fileID: 114770091351261916}
+  - component: {fileID: 114696416719290486}
   m_Layer: 10
   m_Name: BeamEnemy
   m_TagString: Untagged
@@ -55,7 +55,7 @@ GameObject:
   - component: {fileID: 4668127967509528}
   - component: {fileID: 212815472924924562}
   - component: {fileID: 95953925017610480}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: BeamEnemy_Glow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -95,7 +95,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1092013918195492}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6.41, y: 0, z: 0}
+  m_LocalPosition: {x: -5, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4294207077956880}
@@ -113,11 +113,11 @@ Rigidbody2D:
   m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
+  m_UseAutoMass: 1
   m_Mass: 20
   m_LinearDrag: 1
-  m_AngularDrag: 100
-  m_GravityScale: 1
+  m_AngularDrag: 200
+  m_GravityScale: 0
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
@@ -168,7 +168,7 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
---- !u!114 &114770091351261916
+--- !u!114 &114696416719290486
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -176,26 +176,36 @@ MonoBehaviour:
   m_GameObject: {fileID: 1092013918195492}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3bcfa4d4218e80243a006a929d2e6311, type: 3}
+  m_Script: {fileID: 11500000, guid: ec480a6881460fd438d44c2e3a4d07d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   movementSpeed:
     forward: 8
     left: 2
-    back: 4
+    back: 6
     right: 2
-    rotational: 500
-  maxHealth: 200
-  laserSounds:
+    rotational: 800
+  maxHealth: 80
+  weaponFireSounds:
   - {fileID: 8300000, guid: 1e443e5a195cbb144a2effdbcf9510f3, type: 3}
-  laserShotPrefab: {fileID: 1683120580527354, guid: 9f338f8f8423f324fb0aabe335c72ad8,
+  uraniumPrefabs:
+  - {fileID: 1544758040426124, guid: 692e78b05ef43bd4e8aa5be7c4189f88, type: 2}
+  weaponDischargePrefab: {fileID: 1155322385579164, guid: a212e1e90c3473142aea729b59de0eef,
     type: 2}
-  laserCooldown: 1.5
+  weaponCooldown: 8
   animator: {fileID: 95953925017610480}
   target: {fileID: 0}
-  targetDistance: 15
+  targetDistance: 8
   targetDistanceRange: 0.75
   fireDistance: 12
+  dischargeSpawnPoints:
+  - position: {x: 0, y: 1.2}
+    eulerRotation: {x: 0, y: 0, z: 0}
+  environmentLayer:
+    serializedVersion: 2
+    m_Bits: 2048
+  chargeTime: 0.2834
+  chargingSounds: []
 --- !u!212 &212242784932973578
 SpriteRenderer:
   m_ObjectHideFlags: 1
