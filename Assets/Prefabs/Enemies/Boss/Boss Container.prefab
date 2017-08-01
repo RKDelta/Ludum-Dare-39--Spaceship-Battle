@@ -305,6 +305,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 2048
   clearRadius: 50
+  shockwaveEffect: {fileID: 1518916097872280, guid: 6fc29c65b48f79b409cdff8674a8e584,
+    type: 2}
 --- !u!212 &212117184054304590
 SpriteRenderer:
   m_ObjectHideFlags: 1

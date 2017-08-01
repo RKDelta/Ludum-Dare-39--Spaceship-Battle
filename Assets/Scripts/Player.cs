@@ -20,6 +20,8 @@ public class Player : BaseUnit
     public float laserCooldown = 0.15f;
     private float laserTimeTillNextAllowed;
 
+    public float energyPerShot = 0.25f;
+
     public GameObject shields;
 
     public Animator animator;
@@ -212,6 +214,8 @@ public class Player : BaseUnit
                 this.laserSpawnIndex %= this.laserSpawnPoints.Length;
 
                 this.laserTimeTillNextAllowed = this.laserCooldown;
+
+                this.Power -= this.energyPerShot;
 
                 AudioManager.Play(this.laserSounds[UnityEngine.Random.Range(0, this.laserSounds.Length)]);
             }

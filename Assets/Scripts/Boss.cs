@@ -20,7 +20,7 @@ public class Boss : BaseUnit
     float time;
     private bool is_going_left;
 
-    private bool generate_beams = false;
+    private bool generatedBeams = false;
     public GameObject beam;
     public GameObject arms;
 
@@ -39,6 +39,12 @@ public class Boss : BaseUnit
     public LayerMask layersToClear;
     public float clearRadius;
     private bool cleared;
+
+    public Action OnDestroyed;
+
+    private bool inPosition;
+
+    public GameObject shockwaveEffect;
 
     protected override void Start()
     {
@@ -83,25 +89,28 @@ public class Boss : BaseUnit
                             GameController.Instance.RemoveObjectFromRelativeMovement(collider.gameObject);
                         }
                     }
+
+                    GameObject.Instantiate(this.shockwaveEffect, this.transform.position, Quaternion.identity);
                 }
 
-                if (this.generate_beams == false)
+                if (this.generatedBeams == false && this.time >= 4)
                 {
                     Quaternion angle1 = Quaternion.Euler(0, 0, 180);
                     Quaternion angle2 = Quaternion.Euler(0, 0, 90);
                     Quaternion angle3 = Quaternion.Euler(0, 0, -90);
                     Quaternion angle4 = Quaternion.Euler(0, 0, 0);
-
-
+                    
                     Instantiate(this.beam, Vector3.zero, angle1, this.arms.transform).transform.localPosition = Vector3.zero;
                     Instantiate(this.beam, Vector3.zero, angle2, this.arms.transform).transform.localPosition = Vector3.zero;
                     Instantiate(this.beam, Vector3.zero, angle3, this.arms.transform).transform.localPosition = Vector3.zero;
                     Instantiate(this.beam, Vector3.zero, angle4, this.arms.transform).transform.localPosition = Vector3.zero;
 
-                    this.generate_beams = true;
+                    this.generatedBeams = true;
+
+                    this.time -= 6;
                 }
 
-                if (this.time >= 6)
+                if (this.time >= 6 && this.generatedBeams)
                 {
                     this.time -= 6;
 
@@ -149,10 +158,20 @@ public class Boss : BaseUnit
 
     public override void DoDamage(float damageAmount)
     {
+        if (this.generatedBeams == false)
+        {
+            return;
+        }
+
         this.Health -= damageAmount;
 
         if (this.Health <= 0)
         {
+            if (this.OnDestroyed != null)
+            {
+                this.OnDestroyed();
+            }
+
             Destroy(this.gameObject);
             return;
         }

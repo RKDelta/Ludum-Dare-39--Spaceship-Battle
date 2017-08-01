@@ -13,6 +13,8 @@ public class DeathScreen : MonoBehaviour
 
     public HideUI[] otherUIElements;
 
+    private bool hasHidden = true;
+
 	void Start ()
     {
         this.deathScreenOn = false;
@@ -24,7 +26,7 @@ public class DeathScreen : MonoBehaviour
 	
 	void Update ()
     {
-        if (this.deathScreenOn)
+        if (this.deathScreenOn && this.hasHidden == true)
         {
             this.hideUI.Show();
 
@@ -35,8 +37,10 @@ public class DeathScreen : MonoBehaviour
                     other.Hide();
                 }
             }
+
+            this.hasHidden = false;
         }
-        else
+        else if (this.deathScreenOn == false && this.hasHidden == false)
         {
             this.hideUI.Hide();
 
@@ -47,6 +51,8 @@ public class DeathScreen : MonoBehaviour
                     other.Show();
                 }
             }
+
+            this.hasHidden = true;
         }
     }
 

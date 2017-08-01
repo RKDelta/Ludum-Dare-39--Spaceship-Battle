@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEngine.UI;
 
 public class GameController : MonoBehaviour
 {
@@ -28,11 +29,15 @@ public class GameController : MonoBehaviour
 
     public HideUI enemyIndicator;
 
+    public MainMenu mainMenu;
     public DeathScreen deathScreen;
     public PauseScreen pauseScreen;
+    public VictoryScreen victoryScreen;
 
     public float minEnemyIndicatorRange = 15;
     private float minEnemyIndicatorSqrRange;
+
+    public Text waveDisplayText;
 
     private void Awake()
     {
@@ -51,6 +56,10 @@ public class GameController : MonoBehaviour
 
         this.deathScreen.DeactivateDeathScreen();
         this.pauseScreen.DeactivatePauseScreen();
+        this.victoryScreen.DeactivateVictoryScreen();
+        this.mainMenu.ActivateMainMenu();
+
+        this.isPaused = true;
     }
 
     void Start()
@@ -94,6 +103,8 @@ public class GameController : MonoBehaviour
 
         if (this.isPaused == false)
         {
+            this.waveDisplayText.text = string.Format("WAVE: {0}", this.waveIndex);
+
             if (this.enemies.Count == 0 && this.waveIndex < this.waves.Length)
             {
                 foreach (EnemySpawnData data in this.waves[this.waveIndex].enemies)
@@ -141,6 +152,9 @@ public class GameController : MonoBehaviour
                             // ITS A BOSS!
 
                             this.bossBar.boss = enemyGO.GetComponentInChildren<Boss>();
+
+                            this.bossBar.boss.OnDestroyed += this.OnBossDestroyed;
+
                             this.bossBar.gameObject.SetActive(true);
                         }
                     }
@@ -208,6 +222,13 @@ public class GameController : MonoBehaviour
                 this.enemyIndicator.baseAlpha = Mathf.Clamp01(this.enemyIndicator.baseAlpha - Time.deltaTime / 2);
             }
         }
+    }
+
+    void OnBossDestroyed()
+    {
+        this.isPaused = true;
+
+        this.victoryScreen.ActivateVictoryScreen();
     }
 
     void OnEnemyDeath(GameObject enemy)

@@ -51,5 +51,7 @@ public class HideUI : MonoBehaviour
     public void Hide()
     {
         this.hidden = true;
+
+        Debug.Log("hide");
     }
 }

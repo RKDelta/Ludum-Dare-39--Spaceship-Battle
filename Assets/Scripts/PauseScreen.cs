@@ -26,9 +26,11 @@ public class PauseScreen : MonoBehaviour
         this.hideUI.Hide();
     }
 
+    private bool hasHidden = true;
+
     void Update()
     {
-        if (this.pauseScreenOn)
+        if (this.pauseScreenOn && this.hasHidden == true)
         {
             this.hideUI.Show();
 
@@ -39,8 +41,10 @@ public class PauseScreen : MonoBehaviour
                     other.Hide();
                 }
             }
+
+            this.hasHidden = false;
         }
-        else
+        else if(this.pauseScreenOn == false && this.hasHidden == false)
         {
             this.hideUI.Hide();
 
@@ -51,6 +55,8 @@ public class PauseScreen : MonoBehaviour
                     other.Show();
                 }
             }
+
+            this.hasHidden = true;
         }
         
         switch (this.player.controlMode)
