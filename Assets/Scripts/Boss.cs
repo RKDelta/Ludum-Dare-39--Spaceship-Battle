@@ -82,7 +82,7 @@ public class Boss : BaseUnit
                             rb.drag = 0;
 
                             rb.AddForceAtPosition(
-                                Quaternion.Euler(0, 0, Vector3.SignedAngle(collider.transform.position - this.transform.position, Vector3.up, Vector3.back)) * new Vector2(0, 5000),
+                                Quaternion.Euler(0, 0, Vector3.SignedAngle(collider.transform.position - this.transform.position, Vector3.up, Vector3.back)) * new Vector2(0, 10000),
                                 this.transform.position,
                                 ForceMode2D.Impulse);
 
@@ -91,9 +91,13 @@ public class Boss : BaseUnit
                     }
 
                     GameObject.Instantiate(this.shockwaveEffect, this.transform.position, Quaternion.identity);
+
+                    this.cleared = true;
                 }
 
-                if (this.generatedBeams == false && this.time >= 4)
+                this.time += Time.deltaTime;
+
+                if (this.generatedBeams == false && this.time >= 0.75)
                 {
                     Quaternion angle1 = Quaternion.Euler(0, 0, 180);
                     Quaternion angle2 = Quaternion.Euler(0, 0, 90);
@@ -107,7 +111,7 @@ public class Boss : BaseUnit
 
                     this.generatedBeams = true;
 
-                    this.time -= 6;
+                    this.time = 4;
                 }
 
                 if (this.time >= 6 && this.generatedBeams)
@@ -141,8 +145,6 @@ public class Boss : BaseUnit
                         break;
                 }
             }
-
-            this.time += Time.deltaTime;
         }
     }
 
