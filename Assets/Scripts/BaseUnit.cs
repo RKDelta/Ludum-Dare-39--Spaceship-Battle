@@ -78,16 +78,16 @@ public abstract class BaseUnit : MonoBehaviour
 
     protected void MoveRelative(Vector2 direction)
     {
-        this.rb.AddRelativeForce(direction * this.movementSpeed);
+        this.rb.AddRelativeForce(direction * this.movementSpeed * Time.deltaTime * 80);
     }
 
     protected void MoveAbsolute(Vector2 direction)
     {
-        this.rb.AddForce(direction * this.movementSpeed.absolute);
+        this.rb.AddForce(direction * this.movementSpeed.absolute * Time.deltaTime * 80);
     }
 
     protected void Rotate(float torque)
     {
-        this.rb.AddTorque(torque * this.movementSpeed.rotational);
+        this.rb.AddTorque(torque * this.movementSpeed.rotational * Time.deltaTime * 80);
     }
 }

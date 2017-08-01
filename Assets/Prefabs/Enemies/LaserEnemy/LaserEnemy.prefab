@@ -190,7 +190,7 @@ MonoBehaviour:
     right: 4
     absolute: 10
     rotational: 100
-  maxHealth: 200
+  maxHealth: 150
   deathPrefabs:
   - {fileID: 1542568440961304, guid: f79c5f0dd63f0514a84c83cc0a77ba31, type: 2}
   - {fileID: 1672228276106294, guid: 9629d08ed808bfe479e93356d74ab36f, type: 2}

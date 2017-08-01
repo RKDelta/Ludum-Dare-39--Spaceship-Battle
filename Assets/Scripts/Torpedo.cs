@@ -80,13 +80,7 @@ public class Torpedo : BaseUnit
                     this.Explode();
                 }
             }
-        }
-    }
 
-    public void FixedUpdate()
-    {
-        if (GameController.Instance.isPaused == false)
-        {
             if (this.thrustersActive)
             {
                 this.animator.SetBool("Moving", true);

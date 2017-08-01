@@ -21,6 +21,7 @@ public class Player : BaseUnit
     private float laserTimeTillNextAllowed;
 
     public float energyPerShot = 0.25f;
+    public float energyPerMovementSec = 0.25f;
 
     public GameObject shields;
 
@@ -102,9 +103,13 @@ public class Player : BaseUnit
 
             this.laserTimeTillNextAllowed -= Time.deltaTime;
 
+            float amountMoved;
+
             if (this.controlMode == ControlMode.Absolute)
             {
                 Vector2 movement = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+
+                amountMoved = movement.magnitude;
 
                 this.MoveAbsolute(movement);
 
@@ -125,7 +130,11 @@ public class Player : BaseUnit
             }
             else if (this.controlMode == ControlMode.MouseRotation)
             {
-                this.MoveRelative(new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")));
+                Vector2 movement = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+
+                amountMoved = movement.magnitude;
+
+                this.MoveRelative(movement);
 
                 if (Input.GetAxisRaw("Vertical") > 0)
                 {
@@ -144,8 +153,12 @@ public class Player : BaseUnit
             }
             else // Keyboard Rotation
             {
-                this.MoveRelative(new Vector2(Input.GetAxisRaw("Strafe"), Input.GetAxisRaw("Vertical")));
+                Vector2 movement = new Vector2(Input.GetAxisRaw("Strafe"), Input.GetAxisRaw("Vertical"));
 
+                amountMoved = movement.magnitude;
+
+                this.MoveRelative(movement);
+                
                 if (Input.GetAxisRaw("Vertical") > 0)
                 {
                     if (this.animator != null)
@@ -161,8 +174,7 @@ public class Player : BaseUnit
                     }
                 }
             }
-
-
+            
             Debug.DrawRay(this.transform.position, this.transform.up * 100, Color.blue);
 
             float angle;
@@ -178,8 +190,10 @@ public class Player : BaseUnit
                 if (Mathf.Abs(angle) > 1)
                 {
                     this.Rotate(Mathf.Clamp(angle, -1, 1));
-                }
 
+                    this.Power -= (amountMoved + angle) * this.energyPerMovementSec * Time.deltaTime;
+                }
+                
                 targetPos = CameraRig.GetWorldMousePosition();
             }
             else // Keyboard Rotation

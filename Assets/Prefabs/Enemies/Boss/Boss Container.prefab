@@ -300,7 +300,7 @@ MonoBehaviour:
   spinSpeed: 60
   beam: {fileID: 1433677825593652, guid: a7fe7d28f3f37ff4e863a1bc453ef702, type: 2}
   arms: {fileID: 1948640913405930}
-  maxHealth: 1000
+  maxHealth: 1500
   layersToClear:
     serializedVersion: 2
     m_Bits: 2048
